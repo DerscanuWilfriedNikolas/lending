@@ -1,6 +1,7 @@
 package library.lending.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,8 +14,8 @@ public class Person {
     @GeneratedValue
     private Long personId;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "person")
-    @JsonBackReference
     private List<Book> books;
 
     @Column(nullable = false)

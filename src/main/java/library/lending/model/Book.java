@@ -1,8 +1,12 @@
 package library.lending.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -12,11 +16,18 @@ public class Book {
     @GeneratedValue
     private Long bookId;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "person_id")
-    @JsonManagedReference
     private Person person;
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Genre.class)
+    @JoinTable(
+            name = "book_by_genre",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    private List<Genre> genres;
 
     @Column(nullable = false)
     private String title;
@@ -32,6 +43,14 @@ public class Book {
 
     public void setBookId(Long bookId) {
         this.bookId = bookId;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
     }
 
     public Person getPerson() {

@@ -1,10 +1,8 @@
 package library.lending.controller;
 
-import library.lending.exception.PersonNotFoundException;
-import library.lending.model.Book;
-import library.lending.model.Person;
-import library.lending.repository.BookRepository;
-import library.lending.repository.PersonRepository;
+import library.lending.dto.BookDto;
+import library.lending.dto.PersonDto;
+import library.lending.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,21 +20,15 @@ import java.util.List;
 public class PersonController {
 
     @Autowired
-    PersonRepository personRepository;
-
-    @Autowired
-    BookRepository bookRepository;
+    PersonService personService;
 
     @GetMapping("/api/customers")
-    public List<Person> all() {
-        return personRepository.findAll();
+    private List<PersonDto> all() {
+        return personService.getAllPersons();
     }
 
     @GetMapping("/api/customers/{id}/books")
-    public List<Book> books(@PathVariable Long id) {
-        return bookRepository.findAllByPerson(
-                personRepository.findById(id)
-                        .orElseThrow(() -> new PersonNotFoundException(id))
-        );
+    private List<BookDto> books(@PathVariable Long id) {
+        return personService.getAllBooksByPersonId(id);
     }
 }

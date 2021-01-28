@@ -1,13 +1,13 @@
 package library.lending.controller;
 
-import library.lending.exception.BookNotFoundException;
-import library.lending.model.Book;
-import library.lending.model.Genre;
-import library.lending.model.Person;
-import library.lending.repository.BookRepository;
+import library.lending.dto.BookDto;
+import library.lending.dto.GenreDto;
+import library.lending.dto.PersonDto;
+import library.lending.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,24 +23,21 @@ import java.util.List;
 public class BookController {
 
     @Autowired
-    private BookRepository bookRepository;
+    private BookService bookService;
 
     @GetMapping("/api/books")
-    List<Book> all() {
-        return bookRepository.findAll();
+    @ResponseBody
+    private List<BookDto> all() {
+        return bookService.getAllBooks();
     }
 
     @GetMapping("/api/books/{id}/renter")
-    Person renter(@PathVariable Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException(id))
-                .getPerson();
+    private PersonDto renter(@PathVariable Long id) {
+        return bookService.getRenterByBookId(id);
     }
 
     @GetMapping("/api/books/{id}/genres")
-    List<Genre> genres(@PathVariable Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException(id))
-                .getGenres();
+    private List<GenreDto> genres(@PathVariable Long id) {
+        return bookService.getGenresByBookId(id);
     }
 }

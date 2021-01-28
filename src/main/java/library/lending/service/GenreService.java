@@ -19,10 +19,13 @@ public class GenreService {
     @Autowired
     private GenreRepository genreRepository;
 
+    @Autowired
+    private BookService bookService;
+
     public List<GenreDto> getAllGenres() {
         return genreRepository.findAll()
                 .stream()
-                .map(GenreService::convertToGenreDto)
+                .map(this::convertToGenreDto)
                 .collect(Collectors.toList());
     }
 
@@ -33,11 +36,15 @@ public class GenreService {
                 .getBooks();
 
         return books.stream()
-                .map(BookService::convertToBookDto)
+                .map(b -> bookService.convertToBookDto(b))
                 .collect(Collectors.toList());
     }
 
-    static GenreDto convertToGenreDto(Genre genre) {
+    Genre getById(Long id) {
+        return genreRepository.findById(id).orElseThrow(() -> new GenreNotFoundException(id));
+    }
+
+    GenreDto convertToGenreDto(Genre genre) {
         GenreDto genreDto = new GenreDto();
 
         genreDto.setGenreId(genre.getGenreId());

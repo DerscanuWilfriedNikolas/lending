@@ -19,9 +19,12 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
+    @Autowired
+    private BookService bookService;
+
     public List<PersonDto> getAllPersons() {
         return personRepository.findAll().stream()
-                .map(PersonService::convertToPersonDto)
+                .map(this::convertToPersonDto)
                 .collect(Collectors.toList());
     }
 
@@ -33,11 +36,16 @@ public class PersonService {
 
         return books.stream()
                 .distinct()
-                .map(BookService::convertToBookDto)
+                .map(b -> bookService.convertToBookDto(b))
                 .collect(Collectors.toList());
     }
 
-    static PersonDto convertToPersonDto(Person person) {
+    Person getById(Long id) {
+        return personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+    }
+
+
+    PersonDto convertToPersonDto(Person person) {
         PersonDto personDto = new PersonDto();
 
         personDto.setPersonId(person.getPersonId());

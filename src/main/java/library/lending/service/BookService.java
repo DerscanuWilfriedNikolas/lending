@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import library.lending.repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,17 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private GenreService genreService;
+
+    @Autowired
+    private PersonService personService;
+
     public List<BookDto> getAllBooks() {
         return bookRepository
                 .findAll()
                 .stream()
-                .map(BookService::convertToBookDto)
+                .map(this::convertToBookDto)
                 .collect(Collectors.toList());
     }
 
@@ -35,7 +42,7 @@ public class BookService {
                     .findById(id)
                     .orElseThrow(() -> new BookNotFoundException(id))
                     .getPerson();
-        return PersonService.convertToPersonDto(person);
+        return personService.convertToPersonDto(person);
     }
 
     public List<GenreDto> getGenresByBookId(Long id) {
@@ -45,11 +52,33 @@ public class BookService {
                         .getGenres();
         return genres
                             .stream()
-                            .map(GenreService::convertToGenreDto)
+                            .map(g -> genreService.convertToGenreDto(g))
                             .collect(Collectors.toList());
     }
 
-    static BookDto convertToBookDto(Book book) {
+    public BookDto addBook(BookDto bookDto) {
+        Book book = bookRepository.save(convertToBook(bookDto));
+        return convertToBookDto(book);
+    }
+
+    public void deleteBook(Long id) {
+        bookRepository.deleteById(id);
+    }
+
+    Book convertToBook(BookDto bookDto) {
+        Book book = new Book();
+        book.setTitle(bookDto.getTitle());
+        book.setAuthor(bookDto.getAuthor());
+        book.setPerson(null);
+
+        book.setGenres(bookDto.getGenreIds().stream()
+                .map(i -> genreService.getById(i))
+                .collect(Collectors.toList()));
+
+        return book;
+    }
+
+    BookDto convertToBookDto(Book book) {
         BookDto bookDto = new BookDto();
 
         bookDto.setBookId(book.getBookId());
@@ -68,4 +97,5 @@ public class BookService {
 
         return bookDto;
     }
+
 }

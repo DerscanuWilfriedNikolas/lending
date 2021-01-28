@@ -1,5 +1,12 @@
 package library.lending.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import library.lending.dto.BookDto;
 import library.lending.dto.GenreDto;
 import library.lending.dto.PersonDto;
@@ -8,12 +15,6 @@ import library.lending.model.Book;
 import library.lending.model.Genre;
 import library.lending.model.Person;
 import library.lending.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BookService {

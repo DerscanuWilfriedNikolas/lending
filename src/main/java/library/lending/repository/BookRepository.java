@@ -1,12 +1,6 @@
 package library.lending.repository;
 
 import library.lending.model.Book;
-import library.lending.model.Person;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface BookRepository extends JpaRepository<Book, Long> {
-
-    List<Book> findAllByPerson(Person person);
-}
+public interface BookRepository extends JpaRepository<Book, Long> {}

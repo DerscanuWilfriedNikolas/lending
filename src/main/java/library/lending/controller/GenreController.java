@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import library.lending.dto.BookDto;
@@ -16,17 +17,18 @@ import library.lending.service.GenreService;
 * Show genres +
 * */
 @RestController
+@RequestMapping("api/genres")
 class GenreController {
 
     @Autowired
     private GenreService genreService;
 
-    @GetMapping("/api/genres")
+    @GetMapping
     private List<GenreDto> all() {
         return genreService.getAllGenres();
     }
 
-    @GetMapping("/api/genres/{id}/books")
+    @GetMapping("/{id}/books")
     private List<BookDto> books(@PathVariable Long id) {
         return genreService.getAllBooksByGenreId(id);
     }

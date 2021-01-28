@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -23,7 +22,7 @@ public class Person {
     private Long personId;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "person")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "person")
     private List<Book> books;
 
     @Column(nullable = false)

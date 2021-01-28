@@ -3,6 +3,8 @@ package library.lending.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import library.lending.exception.BookNotInPersonPossessionException;
+import library.lending.exception.BookUnavailableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,32 @@ public class PersonService {
                 .distinct()
                 .map(b -> bookService.convertToBookDto(b))
                 .collect(Collectors.toList());
+    }
+
+    public BookDto rentBook(Long customerId, Long bookId) {
+        Person person = personRepository.findById(customerId)
+                .orElseThrow(() -> new PersonNotFoundException(customerId));
+        Book book = bookService.getBookById(bookId);
+
+        if (book.getPerson() == null) {
+            book.setPerson(person);
+        } else {
+            throw new BookUnavailableException(bookId);
+        }
+        return bookService.convertToBookDto(bookService.update(book));
+    }
+
+    public BookDto returnBook(Long customerId, Long bookId) {
+        Person person = personRepository.findById(customerId)
+                .orElseThrow(() -> new PersonNotFoundException(customerId));
+        Book book = bookService.getBookById(bookId);
+
+        if (!book.getPerson().equals(person)) {
+            book.setPerson(null);
+        } else {
+            throw new BookNotInPersonPossessionException(bookId);
+        }
+        return bookService.convertToBookDto(bookService.update(book));
     }
 
     Person getById(Long id) {

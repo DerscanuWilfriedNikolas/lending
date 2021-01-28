@@ -65,6 +65,15 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
+
+    public Book update(Book book) {
+        return bookRepository.save(book);
+    }
+
+    Book getBookById(Long id) {
+        return bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+    }
+
     Book convertToBook(BookDto bookDto) {
         Book book = new Book();
         book.setTitle(bookDto.getTitle());
@@ -97,5 +106,4 @@ public class BookService {
 
         return bookDto;
     }
-
 }

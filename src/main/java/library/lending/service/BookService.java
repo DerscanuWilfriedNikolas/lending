@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import library.lending.repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,40 +19,37 @@ import library.lending.repository.BookRepository;
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
     @Autowired
     private GenreService genreService;
-
     @Autowired
     private PersonService personService;
 
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
     public List<BookDto> getAllBooks() {
-        return bookRepository
-                .findAll()
-                .stream()
+        return bookRepository.findAll().stream()
                 .map(this::convertToBookDto)
                 .collect(Collectors.toList());
     }
 
     public PersonDto getRenterByBookId(Long id) {
-        Person person = bookRepository
-                    .findById(id)
-                    .orElseThrow(() -> new BookNotFoundException(id))
-                    .getPerson();
+        Person person = bookRepository.findById(id)
+                            .orElseThrow(() -> new BookNotFoundException(id))
+                            .getPerson();
         return personService.convertToPersonDto(person);
     }
 
     public List<GenreDto> getGenresByBookId(Long id) {
-        List<Genre> genres = bookRepository
-                        .findById(id)
-                        .orElseThrow(() -> new BookNotFoundException(id))
-                        .getGenres();
-        return genres
-                            .stream()
-                            .map(g -> genreService.convertToGenreDto(g))
-                            .collect(Collectors.toList());
+        List<Genre> genres = bookRepository.findById(id)
+                                .orElseThrow(() -> new BookNotFoundException(id))
+                                .getGenres();
+        return genres.stream()
+                .map(genreService::convertToGenreDto)
+                .collect(Collectors.toList());
     }
 
     public BookDto addBook(BookDto bookDto) {
@@ -71,7 +67,8 @@ public class BookService {
     }
 
     Book getBookById(Long id) {
-        return bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
     }
 
     Book convertToBook(BookDto bookDto) {
@@ -81,8 +78,8 @@ public class BookService {
         book.setPerson(null);
 
         book.setGenres(bookDto.getGenreIds().stream()
-                .map(i -> genreService.getById(i))
-                .collect(Collectors.toList()));
+                            .map(genreService::getById)
+                            .collect(Collectors.toList()));
 
         return book;
     }
@@ -99,8 +96,7 @@ public class BookService {
                 ? book.getPerson().getPersonId() : null);
 
         bookDto.setGenreIds(
-                book.getGenres()
-                        .stream()
+                book.getGenres().stream()
                         .map(Genre::getGenreId)
                         .collect(Collectors.toList()));
 
